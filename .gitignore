@@ -1,0 +1,7 @@
+node_modules/
+/dist/
+/lib/stacks/templates/dist/*.yml
+schemas/
+.env
+.nyc_output
+coverage/

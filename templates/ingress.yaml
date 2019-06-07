@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/cluster-issuer: INGRESS_CERT_ISSUER
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+  name: INGRESS_NAME
+  namespace: NAMESPACE
+spec:
+  rules:
+  - host: INGRESS_HOST
+    http:
+      paths:
+      - backend:
+          serviceName: INGRESS_BACKEND_NAME
+          servicePort: INGRESS_BACKEND_PORT
+  tls:
+  - hosts:
+    - INGRESS_HOST
+    secretName: INGRESS_SSL_CERT_SECRET

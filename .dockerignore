@@ -1,0 +1,16 @@
+.git/
+node_modules/
+tests/
+schemas/
+scripts/
+
+Dockerfile
+README.md
+TODO.md
+CHANGELOG.md
+templates/README.md
+
+.dockerignore
+.nvmrc
+.travis.yml
+.editorconfig

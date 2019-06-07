@@ -1,0 +1,34 @@
+sudo: required
+
+services:
+  - docker
+
+language: node_js
+
+cache:
+  - yarn
+  - npm
+
+before_install:
+  - npm install -g yarn
+
+stages:
+  - test
+  - build
+
+branches:
+  only:
+    - master
+    - /^v?\d+\.\d+(\.\d+)?(-\S*)?$/
+
+jobs:
+  include:
+    - stage: test
+      node_js: 10
+      after_script: cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+    - stage: test
+      node_js: 12
+      after_script: cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+    - stage: build
+      script:
+        - bash scripts/docker-build.sh
