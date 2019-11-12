@@ -12,6 +12,7 @@ const OPTIONS = [
   { name: 'orchestrator-secret-key', options: { description: 'Orchestrator secret key', string: true, global: true, demandOption: true } },
   { name: 'project-id', options: { description: 'Project ID', string: true, global: true } },
   { name: 'unique-id', options: { description: 'Unique ID', string: true, global: true, demandOption: false } },
+  { name: 'verbose', options: { description: 'Activate verbose output', boolean: true, global: true, default: false } },
 ];
 
 describe('command processor', () => {
