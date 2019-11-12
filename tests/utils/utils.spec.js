@@ -165,13 +165,25 @@ describe('rancherExecute util', () => {
   });
 
   describe('with global options', () => {
-    describe('when gobal options has a zero length', () => {
-      beforeEach(() => {
-        Utils.rancherExecute('someCommand', [], []);
+    describe('when there are no global options', () => {
+      describe('when options are null', () => {
+        beforeEach(() => {
+          Utils.rancherExecute('someCommand', [], null);
+        });
+
+        it('should not add any global option to command', () => {
+          expect(shellStub).to.have.been.calledWith('rancher', ['someCommand'], null);
+        });
       });
 
-      it('should not add any global option to command', () => {
-        expect(shellStub).to.have.been.calledWith('rancher', ['someCommand'], null);
+      describe('when the array of options is empty', () => {
+        beforeEach(() => {
+          Utils.rancherExecute('someCommand', [], []);
+        });
+
+        it('should not add any global option to command', () => {
+          expect(shellStub).to.have.been.calledWith('rancher', ['someCommand'], null);
+        });
       });
     });
 

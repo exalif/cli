@@ -1,6 +1,6 @@
 {
   "name": "exalif-cli",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Exalif CLI to deploy on Rancher 2 and do other magic stuff",
   "main": "app.js",
   "scripts": {
@@ -14,21 +14,21 @@
   "dependencies": {
     "ansi-styles": "4.1.0",
     "child-process-promise": "2.2.1",
-    "dotenv": "8.1.0",
+    "dotenv": "8.2.0",
     "figlet": "1.2.4",
     "js-yaml": "3.13.1",
     "ora": "3.4.0",
     "request": "2.88.0",
-    "request-promise-native": "1.0.7",
+    "request-promise-native": "1.0.8",
     "uuid": "3.3.3",
     "yargs": "13.2.4"
   },
   "devDependencies": {
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
-    "conventional-changelog-cli": "2.0.23",
-    "coveralls": "3.0.6",
-    "mocha": "6.2.1",
+    "conventional-changelog-cli": "2.0.27",
+    "coveralls": "3.0.7",
+    "mocha": "6.2.2",
     "nyc": "14.1.1",
     "proxyquire": "2.1.3",
     "sinon": "7.5.0",
