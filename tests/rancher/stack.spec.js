@@ -101,7 +101,12 @@ const RANCHER_INSTANCE_MOCK = {
   force: false,
   namespace: NAMESPACE,
   stackFile: STACKFILE,
-  service: 'someService'
+  service: 'someService',
+  verbose: false,
+};
+const RANCHER_INSTANCE_VERBOSE = {
+  ...RANCHER_INSTANCE_MOCK,
+  verbose: true
 }
 
 const INGRESS = '{"issuer": "letsencrypt-prod", "name": "ingress-testing", "host": "ingress-testing-com", "backend": "client", "port": 80, "cert": "ingress-testing-com-tls"}';
@@ -198,6 +203,27 @@ describe('RancherStackUtils class', () => {
       command = instance.deployStack.bind(instance);
     });
 
+    describe('when on verbose mode', () => {
+      beforeEach(() => {
+        instance = new RancherStackUtils(RANCHER_INSTANCE_VERBOSE);
+        instance.stackTemplate = STACKTEMPLATE;
+
+        withSpinnerStub.onFirstCall().resolves(EXPECTED_INGRESS_REPLACED);
+        instance.createStackTemplateWithReplacedValues = sandbox.stub().resolves(EXPECTED_INGRESS_REPLACED);
+        instance.createStackOnCluster = sandbox.stub().resolves();
+        instance.checkStackDeploy = sandbox.stub().resolves();
+
+        command = instance.deployStack.bind(instance);
+      });
+
+      it('should display generated stack', async () => {
+        await command();
+
+        const createStackTemplateArgs = withSpinnerStub.getCall(0).args[0];
+        expect(createStackTemplateArgs.textOnSuccess('someResult')).to.equal(`[someStackFile.yaml] Stack template generated: \n${style.cyan.open}someResult${style.cyan.close}`);
+      });
+    });
+
     it('should call createStackTemplate', async () => {
       await command();
 
@@ -206,7 +232,7 @@ describe('RancherStackUtils class', () => {
       expect(instance.createStackTemplateWithReplacedValues).to.have.been.called;
       expect(createStackTemplateArgs.textOnStart).to.equal(`[${STACKFILE}] Generating stack template...`);
       expect(createStackTemplateArgs.spinnerType).to.equal(`arrow3`);
-      expect(createStackTemplateArgs.textOnSuccess('someResult')).to.equal(`Stack template generated: \n${style.cyan.open}someResult${style.cyan.close}`);
+      expect(createStackTemplateArgs.textOnSuccess('someResult')).to.equal(`[someStackFile.yaml] Stack template generated`);
       expect(createStackTemplateArgs.textOnError('someError')).to.equal(`someError`);
     });
 
@@ -462,12 +488,12 @@ describe('RancherStackUtils class', () => {
       });
     });
 
-    describe('when fail with error name', () => {
+    describe('when fail with error code of ENOENT', () => {
       let command, instance;
 
       beforeEach(() => {
         writeFileStub.callsFake(() => {
-          throw { name: 'errorName' };
+          throw { code: 'ENOENT', path: 'somePath' };
         });
 
         instance = new RancherStackUtils(RANCHER_INSTANCE_MOCK);
@@ -475,7 +501,7 @@ describe('RancherStackUtils class', () => {
       });
 
       it('should reject with error', async () => {
-        await expect(command()).to.eventually.be.rejectedWith('errorName');
+        await expect(command()).to.eventually.be.rejectedWith('ENOENT - Cannot read: somePath');
       });
     });
   });
