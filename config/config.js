@@ -18,6 +18,7 @@ exports.config = {
       TAG: 'image',
       ...ingressTemplateReplaceMap
     },
+    checkDeployTypes: ['ingress', 'deployment'],
     ingress: {
       checkKeys: ['state'],
       expectedCheckValues: ['active'],

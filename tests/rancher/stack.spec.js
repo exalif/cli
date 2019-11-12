@@ -23,15 +23,16 @@ const ingressTemplateReplaceMap = {
 }
 
 const CONFIG = {
-    name: 'Exalif CLI',
-    templateDirectory: 'templates',
-    templateDestinationDirectory: 'schemas',
-    ingressTemplateReplaceMap,
-    stackTemplateReplaceMap: {
-      UNIQUE_ID: 'uniqueId',
-      TAG: 'image',
-      ...ingressTemplateReplaceMap
-    }
+  name: 'Exalif CLI',
+  templateDirectory: 'templates',
+  templateDestinationDirectory: 'schemas',
+  ingressTemplateReplaceMap,
+  stackTemplateReplaceMap: {
+    UNIQUE_ID: 'uniqueId',
+    TAG: 'image',
+    ...ingressTemplateReplaceMap
+  },
+  checkDeployTypes: ['ingress', 'deployment'],
 }
 const TARGET_SERVICE = 'deployment:SomeTargetService';
 const UUID = 'SomeMagicgv4';
@@ -133,7 +134,13 @@ describe('RancherStackUtils class', () => {
         {
           kind: 'Ingress',
           metadata: {
-            name: 'ngress-testing'
+            name: 'ingress-testing'
+          }
+        },
+        {
+          kind: 'ConfigMap',
+          metadata: {
+            name: 'config-map-testing'
           }
         }
       ]
@@ -315,6 +322,12 @@ describe('RancherStackUtils class', () => {
         await command(EXPECTED_INGRESS_REPLACED);
 
         expect(safeLoadStub).to.have.been.calledWith(EXPECTED_INGRESS_REPLACED);
+      });
+
+      it('should check target only for ingress or deployment', async () => {
+        await command();
+
+        expect(getRancherTargetStub).to.have.callCount(1);
       });
 
       it('should call getRancherTarget', async () => {
