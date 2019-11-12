@@ -1,3 +1,17 @@
+# [3.1.0](https://github.com/exalif/cli/compare/3.0.1...3.1.0) (2019-11-12)
+
+
+### Bug Fixes
+
+* check on resource type before checking deploy status ([ca36cbc](https://github.com/exalif/cli/commit/ca36cbce065dc6bf63c87e6ee79bf91920c691c7))
+
+
+### Features
+
+* add verbose option ([1240af3](https://github.com/exalif/cli/commit/1240af3a8b26eaa1ea4defa2a8aef5ae6ba26e2a))
+
+
+
 ## [3.0.1](https://github.com/exalif/cli/compare/3.0.0...3.0.1) (2019-11-12)
 
 
