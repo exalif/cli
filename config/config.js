@@ -9,26 +9,36 @@ const ingressTemplateReplaceMap = {
 }
 
 exports.config = {
-    name: 'Exalif CLI',
-    templateDirectory: 'templates',
-    templateDestinationDirectory: 'schemas',
-    ingressTemplateReplaceMap,
-    stackTemplateReplaceMap: {
-      UNIQUE_ID: 'uniqueId',
-      TAG: 'image',
-      ...ingressTemplateReplaceMap
-    },
-    checkDeployTypes: ['ingress', 'deployment', 'statefulset'],
-    ingress: {
-      checkKeys: ['state'],
-      expectedCheckValues: ['active'],
-      maxCheckRetries: 20,
-      initialCheckWaitDelay: 15000
-    },
-    deployment: {
-      checkKeys: ['state', 'deploymentStatus.availableReplicas'],
-      expectedCheckValues: ['active', '1'],
-      maxCheckRetries: 20,
-      initialCheckWaitDelay: 3000
-    }
+  name: 'Exalif CLI',
+  templateDirectory: 'templates',
+  templateDestinationDirectory: 'schemas',
+  ingressTemplateReplaceMap,
+  stackTemplateReplaceMap: {
+    UNIQUE_ID: 'uniqueId',
+    TAG: 'image',
+    ...ingressTemplateReplaceMap,
+  },
+  checkDeployTypes: ['ingress', 'deployment', 'statefulset'],
+  checkReplicas: [
+    { type: 'deployment', replicasStatusKey: 'deploymentStatus.availableReplicas' },
+    { type: 'statefulset', replicasStatusKey: 'statefulSetStatus.readyReplicas' },
+  ],
+  ingress: {
+    checkKeys: ['state'],
+    expectedCheckValues: ['active'],
+    maxCheckRetries: 20,
+    initialCheckWaitDelay: 15000,
+  },
+  deployment: {
+    checkKeys: ['state', 'deploymentStatus.availableReplicas'],
+    expectedCheckValues: ['active', '1'],
+    maxCheckRetries: 20,
+    initialCheckWaitDelay: 3000,
+  },
+  statefulset: {
+    checkKeys: ['state', 'statefulSetStatus.readyReplicas'],
+    expectedCheckValues: ['active', '1'],
+    maxCheckRetries: 20,
+    initialCheckWaitDelay: 3000,
+  },
 }
