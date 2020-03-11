@@ -32,7 +32,7 @@ const CONFIG = {
     TAG: 'image',
     ...ingressTemplateReplaceMap
   },
-  checkDeployTypes: ['ingress', 'deployment'],
+  checkDeployTypes: ['ingress', 'deployment', 'statefulset'],
 }
 const TARGET_SERVICE = 'deployment:SomeTargetService';
 const UUID = 'SomeMagicgv4';
