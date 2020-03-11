@@ -10,7 +10,7 @@ const style = require('ansi-styles');
 
 let proxyquireStrict = require('proxyquire').noCallThru();
 
-let sandbox, RancherIngressUtils, consoleStub, rancherExecuteStub, withSpinnerStub, uuidv4Stub, loginStub, readFileStub, mkdirStub, writeFileStub, createNamespaceStub, copyCertificateStub, safeLoadStub, getRancherTargetStub, checkDeployOnClusterStub, displayStackResultStub;
+let sandbox, RancherIngressUtils, consoleStub, rancherExecuteStub, withSpinnerStub, loginStub, readFileStub, mkdirStub, writeFileStub, getRancherTargetStub, checkDeployOnClusterStub;
 
 const ingressTemplateReplaceMap = {
   INGRESS_CERT_ISSUER: 'issuer',

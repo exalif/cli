@@ -217,7 +217,9 @@ describe('RancherUtils class', () => {
         retryTaskUntilExpectedValue: retryTaskUntilExpectedValueStub
       },
       'request-promise-native': requestPromiseStub,
-      'uuid/v4': sandbox.stub().returns(UUID),
+      'uuid': {
+        v4: sandbox.stub().returns(UUID),
+      },
       'fs': {
         writeFileSync: writeFileStub
       }

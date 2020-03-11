@@ -30,11 +30,7 @@ describe('withSpinner class', () => {
       fail: failStub,
       succeed: succeedStub
     }));
-    oraStub = sandbox.stub(ora, 'default').callsFake(() => {
-      return {
-          start
-      }
-    });
+    oraStub = sandbox.stub().callsFake(() => ({ start }));
     withSpinner = proxyquireStrict('../../lib/utils/withSpinner', {
       ora: oraStub
     });
