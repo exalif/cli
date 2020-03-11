@@ -1,3 +1,12 @@
+## [3.1.1](https://github.com/exalif/cli/compare/3.1.0...3.1.1) (2020-03-11)
+
+
+### Features
+
+* update dependencies ([#6](https://github.com/exalif/cli/issues/6)) ([c86318f](https://github.com/exalif/cli/commit/c86318f86e1cfc5833c09ea054dcbfc3a0e6fe87))
+
+
+
 # [3.1.0](https://github.com/exalif/cli/compare/3.0.1...3.1.0) (2019-11-12)
 
 
