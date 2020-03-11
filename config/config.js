@@ -24,20 +24,25 @@ exports.config = {
     { type: 'statefulset', replicasStatusKey: 'statefulSetStatus.readyReplicas' },
   ],
   ingress: {
-    checkKeys: ['state'],
-    expectedCheckValues: ['active'],
+    checks: {
+      state: 'active',
+    },
     maxCheckRetries: 20,
     initialCheckWaitDelay: 15000,
   },
   deployment: {
-    checkKeys: ['state', 'deploymentStatus.availableReplicas'],
-    expectedCheckValues: ['active', '1'],
+    checks: {
+      state: 'active',
+      'deploymentStatus.availableReplicas': 1,
+    },
     maxCheckRetries: 20,
     initialCheckWaitDelay: 3000,
   },
   statefulset: {
-    checkKeys: ['state', 'statefulSetStatus.readyReplicas'],
-    expectedCheckValues: ['active', '1'],
+    checks: {
+      state: 'active',
+      'statefulSetStatus.readyReplicas': 1,
+    },
     maxCheckRetries: 20,
     initialCheckWaitDelay: 3000,
   },
