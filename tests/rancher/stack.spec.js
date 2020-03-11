@@ -183,7 +183,9 @@ describe('RancherStackUtils class', () => {
       '../../config/config': {
         config: CONFIG
       },
-      'uuid/v4': uuidv4Stub,
+      'uuid': {
+        v4: uuidv4Stub,
+      },
       'js-yaml': {
         safeLoad: safeLoadStub
       }

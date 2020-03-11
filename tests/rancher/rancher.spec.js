@@ -10,7 +10,7 @@ const style = require('ansi-styles');
 
 let proxyquireStrict = require('proxyquire').noCallThru();
 
-let sandbox, rancher, consoleStub, getDefaultFromStringOrJsonStub;
+let sandbox, rancher, consoleStub, getDefaultFromStringOrJsonStub, uuidv4Stub;
 
 const UUID = 'someUUID';
 const DEFAULT_OBJECT_VALID = {
@@ -50,11 +50,15 @@ describe('rancher class', () => {
       }
     });
 
+    uuidv4Stub = sandbox.stub().returns(UUID)
+
     rancher = proxyquireStrict('../../lib/rancher/rancher', {
       '../utils/utils': {
         getDefaultFromStringOrJson: getDefaultFromStringOrJsonStub
       },
-      'uuid/v4': sandbox.stub().returns(UUID)
+      'uuid': {
+        v4: uuidv4Stub
+      },
     });
   });
 
