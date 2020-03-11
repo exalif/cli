@@ -1,3 +1,12 @@
+# [3.2.0](https://github.com/exalif/cli/compare/3.1.1...3.2.0) (2020-03-11)
+
+
+### Features
+
+* add statefulset in watched services at start ([#7](https://github.com/exalif/cli/issues/7)) ([eb515e0](https://github.com/exalif/cli/commit/eb515e0b2fa8faaf6b8168b774fa435d857c04e7))
+
+
+
 ## [3.1.1](https://github.com/exalif/cli/compare/3.1.0...3.1.1) (2020-03-11)
 
 
