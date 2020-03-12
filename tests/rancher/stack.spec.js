@@ -134,13 +134,19 @@ describe('RancherStackUtils class', () => {
         {
           kind: 'Ingress',
           metadata: {
-            name: 'ingress-testing'
-          }
+            name: 'ingress-testing',
+          },
+          spec: {
+            replicas: 2,
+          },
         },
         {
           kind: 'ConfigMap',
           metadata: {
-            name: 'config-map-testing'
+            name: 'config-map-testing',
+          },
+          spec: {
+            replicas: 2,
           }
         }
       ]
