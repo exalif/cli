@@ -26,7 +26,7 @@ const OPTIONS = [
   { name: 'assert-against-template-replicas', options: { alias: ['template-replicas', 'tr'], describe: 'Assert against template replicas instead of default count of 1 for deployments and statefulset', default: false, global: true, boolean: true } }
 ];
 
-describe.only('deploy stack', () => {
+describe('deploy stack', () => {
   it('should have proper command', () => {
     expect(command).to.equal(COMMAND);
   });
