@@ -1,3 +1,12 @@
+# [3.3.0](https://github.com/exalif/cli/compare/3.2.1...3.3.0) (2020-03-12)
+
+
+### Features
+
+* add template replicas to generate deploy check ([#9](https://github.com/exalif/cli/issues/9)) ([27d5bdb](https://github.com/exalif/cli/commit/27d5bdbff53eda32f3c7a035c3ba91a06b21260b))
+
+
+
 ## [3.2.1](https://github.com/exalif/cli/compare/3.2.0...3.2.1) (2020-03-12)
 
 
