@@ -23,6 +23,7 @@ const OPTIONS = [
   { name: 'image', options: { description: 'Image to use during deploy', default: 'latest', string: true, global: true, demandOption: false } },
   { name: 'create-non-existing-namespace', options: { alias: ['cn'], describe: 'Create namespace if it doesn\'t exist', default: true, global: true, boolean: true } },
   { name: 'copy-certificate-from-namespace', options: { alias: ['cert-from', 'cf'], describe: 'Copy SSL certificate from other namespace', default: null, string: true, global: true, implies: 'ingress' } },
+  { name: 'assert-against-template-replicas', options: { alias: ['template-replicas', 'tr'], describe: 'Assert against template replicas instead of default count of 1 for deployments and statefulset', default: false, global: true, boolean: true } }
 ];
 
 describe('deploy stack', () => {

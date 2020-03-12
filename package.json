@@ -1,6 +1,6 @@
 {
   "name": "exalif-cli",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Exalif CLI to deploy on Rancher 2 and do other magic stuff",
   "main": "app.js",
   "scripts": {

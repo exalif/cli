@@ -28,6 +28,31 @@ const RANCHER_INSTANCE_MOCK_DEPLOYMENT = {
   type: 'deployment'
 }
 
+const RANCHER_INSTANCE_MOCK_STATEFULSET = {
+  ...RANCHER_INSTANCE_MOCK,
+  type: 'statefulset'
+}
+
+const RANCHER_INSTANCE_MOCK_ASSERT_AGAINST_REPLICAS = {
+  ...RANCHER_INSTANCE_MOCK_DEPLOYMENT,
+  assertAgainstTemplateReplicas: true,
+}
+
+const RANCHER_INSTANCE_MOCK_WITH_REPLICAS = {
+  ...RANCHER_INSTANCE_MOCK_ASSERT_AGAINST_REPLICAS,
+  replicas: 2,
+}
+
+const RANCHER_INSTANCE_MOCK_REPLICAS_TYPE_MATCHING_CONFIG = {
+  ...RANCHER_INSTANCE_MOCK_WITH_REPLICAS,
+  type: 'statefulset',
+}
+
+const RANCHER_INSTANCE_MOCK_NO_REPLICAS = {
+  ...RANCHER_INSTANCE_MOCK_REPLICAS_TYPE_MATCHING_CONFIG,
+  replicas: null,
+}
+
 const RANCHER_INSTANCE_MOCK_INGRESS = {
   ...RANCHER_INSTANCE_MOCK,
   type: 'ingress'
@@ -63,14 +88,28 @@ const EXPECTED_REQ_PAYLOAD = {
 
 const CONFIG = {
   ingress: {
-    checkKeys: ['state'],
-    expectedCheckValues: ['active'],
+    checks: {
+      state: 'active',
+    },
     maxCheckRetries: 20,
     initialCheckWaitDelay: 15000
   },
+  checkReplicas: [
+    { type: 'statefulset', replicasStatusKey: 'statefulSetStatus.readyReplicas' },
+  ],
   deployment: {
-    checkKeys: ['state', 'deploymentStatus.availableReplicas'],
-    expectedCheckValues: ['active', '1'],
+    checks: {
+      state: 'active',
+      'deploymentStatus.availableReplicas': 1,
+    },
+    maxCheckRetries: 20,
+    initialCheckWaitDelay: 3000
+  },
+  statefulset: {
+    checks: {
+      state: 'active',
+      'statefulSetStatus.readyReplicas': 1,
+    },
     maxCheckRetries: 20,
     initialCheckWaitDelay: 3000
   },
@@ -79,9 +118,22 @@ const CONFIG = {
   templateDestinationDirectory: 'schemas',
 };
 
+const EXPECTED_CHANGED_REPLICAS_CHECKS = {
+  state: 'active',
+  'statefulSetStatus.readyReplicas': 2,
+};
+
 const EXPECTED_CONDITION_DEPLOYMENT = `Checking that status of service match: `
   + '\n  state = active'
   + '\n  deploymentStatus.availableReplicas = 1';
+
+const EXPECTED_CONDITION_STATEFULSET = `Checking that status of service match: `
+  + '\n  state = active'
+  + '\n  statefulSetStatus.readyReplicas = 1';
+
+  const EXPECTED_CONDITION_STATEFULSET_REPLICAS = `Checking that status of service match: `
+  + '\n  state = active'
+  + '\n  statefulSetStatus.readyReplicas = 2';
 
 const EXPECTED_CONDITION_INGRESS = `Checking that status of service match: `
   + '\n  state = active';
@@ -258,12 +310,26 @@ describe('RancherUtils class', () => {
       await expect(command(TARGET_SERVICE_NAME)).to.eventually.become(SERVICE_UPGRADE_PAYLOAD);
     });
 
-    describe('when type is not deployment', () => {
+    describe('when type is not deployment or statefulset', () => {
       it('should call rancherExecute with proper arguments', async () => {
         await command(TARGET_SERVICE_NAME);
 
         expect(rancherExecuteStub).to.have.been.calledWith(
           'inspect', [TARGET_SERVICE_NAME]
+        );
+      });
+    });
+
+    describe('when type is statefulset', () => {
+      beforeEach(() => {
+        command = RancherUtils.getServiceUpgradePayload.bind(RANCHER_INSTANCE_MOCK_STATEFULSET);
+      });
+
+      it('should call rancherExecute with proper arguments', async () => {
+        await command(TARGET_SERVICE_NAME);
+
+        expect(rancherExecuteStub).to.have.been.calledWith(
+          'inspect', [`statefulset:${TARGET_SERVICE_NAME}`]
         );
       });
     });
@@ -339,8 +405,7 @@ describe('RancherUtils class', () => {
           [`deployment:${TARGET_SERVICE_NAME}`]
         );
 
-        expect(callArgs.expectedKeys).to.equal(CONFIG.deployment.checkKeys);
-        expect(callArgs.expectedValues).to.equal(CONFIG.deployment.expectedCheckValues);
+        expect(callArgs.checks).to.deep.equal(CONFIG.deployment.checks);
         expect(callArgs.maxRetries).to.equal(CONFIG.deployment.maxCheckRetries);
         expect(callArgs.initialWaitDelay).to.equal(CONFIG.deployment.initialCheckWaitDelay);
       });
@@ -365,10 +430,76 @@ describe('RancherUtils class', () => {
           ]
         );
 
-        expect(callArgs.expectedKeys).to.equal(CONFIG.ingress.checkKeys);
-        expect(callArgs.expectedValues).to.equal(CONFIG.ingress.expectedCheckValues);
+        expect(callArgs.checks).to.deep.equal(CONFIG.ingress.checks);
         expect(callArgs.maxRetries).to.equal(CONFIG.ingress.maxCheckRetries);
         expect(callArgs.initialWaitDelay).to.equal(CONFIG.ingress.initialCheckWaitDelay);
+      });
+    });
+
+    describe('when assert against template replicas option is set to true', () => {
+      describe('when there are replicas in service template', () => {
+        describe('when config replicas key exists on type check', () => {
+          beforeEach(() => {
+            command = RancherUtils.checkDeployOnCluster.bind(RANCHER_INSTANCE_MOCK_REPLICAS_TYPE_MATCHING_CONFIG);
+          });
+
+          it('should execute checkDeployOnCluster command without replacing replicas checks', async () => {
+            await command(TARGET_SERVICE_NAME);
+            const callArgs = retryTaskUntilExpectedValueStub.getCall(0).args[0];
+
+            expect(consoleStub).to.have.been.calledWith(EXPECTED_CONDITION_STATEFULSET_REPLICAS)
+            expect(rancherExecuteStub).to.have.been.calledWith(
+              'inspect',
+              [`statefulset:${TARGET_SERVICE_NAME}`]
+            );
+
+            expect(callArgs.checks).to.deep.equal(EXPECTED_CHANGED_REPLICAS_CHECKS);
+            expect(callArgs.maxRetries).to.equal(CONFIG.statefulset.maxCheckRetries);
+            expect(callArgs.initialWaitDelay).to.equal(CONFIG.statefulset.initialCheckWaitDelay);
+          });
+        });
+
+        describe('when config replicas key is not found', () => {
+          beforeEach(() => {
+            command = RancherUtils.checkDeployOnCluster.bind(RANCHER_INSTANCE_MOCK_WITH_REPLICAS);
+          });
+
+          it('should execute checkDeployOnCluster command', async () => {
+            await command(TARGET_SERVICE_NAME);
+            const callArgs = retryTaskUntilExpectedValueStub.getCall(0).args[0];
+
+            expect(consoleStub).to.have.been.calledWith(EXPECTED_CONDITION_DEPLOYMENT)
+            expect(rancherExecuteStub).to.have.been.calledWith(
+              'inspect',
+              [`deployment:${TARGET_SERVICE_NAME}`]
+            );
+
+            expect(callArgs.checks).to.deep.equal(CONFIG.deployment.checks);
+            expect(callArgs.maxRetries).to.equal(CONFIG.deployment.maxCheckRetries);
+            expect(callArgs.initialWaitDelay).to.equal(CONFIG.deployment.initialCheckWaitDelay);
+          });
+        });
+      });
+
+      describe('when there are no replicas in service template', () => {
+        beforeEach(() => {
+          command = RancherUtils.checkDeployOnCluster.bind(RANCHER_INSTANCE_MOCK_NO_REPLICAS);
+        });
+
+        it('should execute checkDeployOnCluster command without replacing replicas checks', async () => {
+          await command(TARGET_SERVICE_NAME);
+          const callArgs = retryTaskUntilExpectedValueStub.getCall(0).args[0];
+
+          expect(consoleStub).to.have.been.calledWith(EXPECTED_CONDITION_STATEFULSET)
+          expect(rancherExecuteStub).to.have.been.calledWith(
+            'inspect',
+            [`statefulset:${TARGET_SERVICE_NAME}`]
+          );
+
+          expect(callArgs.checks).to.deep.equal(CONFIG.statefulset.checks);
+          expect(callArgs.maxRetries).to.equal(CONFIG.statefulset.maxCheckRetries);
+          expect(callArgs.initialWaitDelay).to.equal(CONFIG.statefulset.initialCheckWaitDelay);
+        });
       });
     });
   });
