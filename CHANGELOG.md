@@ -1,3 +1,12 @@
+## [3.2.1](https://github.com/exalif/cli/compare/3.2.0...3.2.1) (2020-03-12)
+
+
+### Bug Fixes
+
+* empty statefulset check config ([#8](https://github.com/exalif/cli/issues/8)) ([3dbb845](https://github.com/exalif/cli/commit/3dbb845992ec92b8d230eefacb6dfafc7ead2078))
+
+
+
 # [3.2.0](https://github.com/exalif/cli/compare/3.1.1...3.2.0) (2020-03-11)
 
 
