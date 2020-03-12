@@ -21,7 +21,8 @@ const DEFAULT_OBJECT_VALID = {
   namespace: 'someNamespace',
   force: false,
   createNonExistingNamespace: false,
-  stackFile: 'some/stack/file.yml'
+  stackFile: 'some/stack/file.yml',
+  assertAgainstTemplateReplicas: false,
 }
 const WITH_IMAGE = { ...DEFAULT_OBJECT_VALID, image: 'someDockerImage' };
 const WITH_SERVICE_LIST = { ...DEFAULT_OBJECT_VALID, servicesList: ['service1', 'service2'] };
@@ -78,6 +79,7 @@ describe('rancher class', () => {
       it('should have default values', () => {
         expect(instance.uniqueId).to.equal(UUID);
         expect(instance.createNonExistingNamespace).to.equal(true);
+        expect(instance.assertAgainstTemplateReplicas).to.equal(false);
 
         expect(instance.orchestratorUrl).to.equal(null);
         expect(instance.orchestratorAccessKey).to.equal(null);
@@ -106,6 +108,7 @@ describe('rancher class', () => {
       it('should have default values', () => {
         expect(instance.uniqueId).to.equal(UUID);
         expect(instance.createNonExistingNamespace).to.equal(true);
+        expect(instance.assertAgainstTemplateReplicas).to.equal(false);
 
         expect(instance.orchestratorUrl).to.equal(null);
         expect(instance.orchestratorAccessKey).to.equal(null);
@@ -143,6 +146,7 @@ describe('rancher class', () => {
         expect(instance.namespace).to.equal(`${DEFAULT_OBJECT_VALID.namespace}`);
         expect(instance.force).to.equal(DEFAULT_OBJECT_VALID.force);
         expect(instance.createNonExistingNamespace).to.equal(DEFAULT_OBJECT_VALID.createNonExistingNamespace);
+        expect(instance.assertAgainstTemplateReplicas).to.equal(DEFAULT_OBJECT_VALID.assertAgainstTemplateReplicas);
         expect(instance.stackFile).to.equal(`${DEFAULT_OBJECT_VALID.stackFile}`);
       });
 

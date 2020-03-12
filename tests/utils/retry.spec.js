@@ -13,9 +13,17 @@ let proxyquireStrict = require('proxyquire').noCallThru();
 let sandbox, waitStub, retry, successfulCommand, failedCommand, consoleStub, leafStub, spinnerStub, spinnerTextStub, successfulCommandNoJson;
 
 const SUCCESSFUL_RESPONSE = { status: 'status value', payload: 'payload value', deep: { key: 'deep.key value' } };
-const SUCCESSFUL_EXPECTED_KEYS = ['status', 'payload', 'deep.key']
-const SUCCESSFUL_EXPECTED_KEYS_ERROR = ['status', 'payload', 'noExistingKey']
-const SUCCESSFUL_EXPECTED_VALUES = [SUCCESSFUL_RESPONSE.status, SUCCESSFUL_RESPONSE.payload, SUCCESSFUL_RESPONSE.deep.key];
+const SUCCESSFUL_CHECKS = {
+  status: SUCCESSFUL_RESPONSE.status,
+  payload: SUCCESSFUL_RESPONSE.payload,
+  'deep.key': SUCCESSFUL_RESPONSE.deep.key,
+};
+const ERROR_CHECKS = {
+  status: SUCCESSFUL_RESPONSE.status,
+  payload: SUCCESSFUL_RESPONSE.payload,
+  noExistingKey: 'someErroredValue',
+};
+
 const DEFAULT_TIMEOUT = 10;
 const MODIFIED_TIMEOUT = 2;
 
@@ -78,13 +86,13 @@ describe('retry class', () => {
     describe('when command is errored', () => {
       it('should reject with an error', async () => {
         const maxRetries = 2;
-        const retryRun = retry.retryTaskUntilExpectedValue({ task: failedCommand, expectedKeys: SUCCESSFUL_EXPECTED_KEYS_ERROR, expectedValues: SUCCESSFUL_EXPECTED_VALUES, maxRetries, timeout: MODIFIED_TIMEOUT });
+        const retryRun = retry.retryTaskUntilExpectedValue({ task: failedCommand, checks: ERROR_CHECKS, maxRetries, timeout: MODIFIED_TIMEOUT });
 
         await expect(retryRun).to.eventually.be.rejectedWith(`ERROR: Unexpected error while running retried task`);
       });
     });
 
-    describe('when there is no expectedKeys', () => {
+    describe('when there is no checks', () => {
       describe('with default expected type to JSON', () => {
         it('should resolve with OK', async () => {
           const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand });
@@ -94,24 +102,12 @@ describe('retry class', () => {
         });
       });
 
-      describe('with empty expected keys array', () => {
+      describe('with empty expected checks array', () => {
         it('should resolve with OK', async () => {
-          const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: [] });
+          const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, checks: [] });
 
           await expect(retryRun).to.eventually.become('OK');
           expect(successfulCommand).to.have.callCount(1);
-        });
-      });
-
-      describe('when values count mismatches keys count', () => {
-        it('should resolve with OK', async () => {
-          let retryRunWithNoValues = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: ['val'], expectedValues: [] });
-          await expect(retryRunWithNoValues).to.eventually.become('OK');
-          expect(successfulCommand).to.have.callCount(1);
-
-          let retryRunWithMoreValues = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: ['val'], expectedValues: ['val1', 'val2'] });
-          await expect(retryRunWithMoreValues).to.eventually.become('OK');
-          expect(successfulCommand).to.have.callCount(2);
         });
       });
 
@@ -125,11 +121,10 @@ describe('retry class', () => {
       });
     });
 
-    describe('when there are expectedKeys to validate', () => {
+    describe('when there are checks to be performed', () => {
       describe('when result match expected values', () => {
         it('should resolve with OK', async () => {
-          const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: SUCCESSFUL_EXPECTED_KEYS, expectedValues: SUCCESSFUL_EXPECTED_VALUES });
-
+          const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, checks: SUCCESSFUL_CHECKS });
           await expect(retryRun).to.eventually.become('OK');
           expect(successfulCommand).to.have.callCount(1);
         });
@@ -137,14 +132,14 @@ describe('retry class', () => {
 
       describe('when result does not match expected values', () => {
         it('should resolve with NOK', async () => {
-          const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: SUCCESSFUL_EXPECTED_KEYS_ERROR, expectedValues: SUCCESSFUL_EXPECTED_VALUES });
+          const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, checks: ERROR_CHECKS });
 
           await expect(retryRun).to.eventually.become('NOK');
         });
 
         describe('retry', () => {
           it('should retry 10 times by default', async () => {
-            const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: SUCCESSFUL_EXPECTED_KEYS_ERROR, expectedValues: SUCCESSFUL_EXPECTED_VALUES });
+            const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, checks: ERROR_CHECKS });
 
             await retryRun;
 
@@ -152,7 +147,7 @@ describe('retry class', () => {
           });
 
           it('should retry `maxRetries` times', async () => {
-            const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: SUCCESSFUL_EXPECTED_KEYS_ERROR, expectedValues: SUCCESSFUL_EXPECTED_VALUES, maxRetries: 2 });
+            const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, checks: ERROR_CHECKS, maxRetries: 2 });
 
             await retryRun;
 
@@ -161,7 +156,7 @@ describe('retry class', () => {
 
           it('should print proper messages during retries', async () => {
             const maxRetries = 3;
-            const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: SUCCESSFUL_EXPECTED_KEYS_ERROR, expectedValues: SUCCESSFUL_EXPECTED_VALUES, maxRetries });
+            const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, checks: ERROR_CHECKS, maxRetries });
 
             await retryRun;
 
@@ -174,7 +169,7 @@ describe('retry class', () => {
           describe('wait between retries', () => {
             it('should wait two times between messages', async () => {
               const maxRetries = 2;
-              const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: SUCCESSFUL_EXPECTED_KEYS_ERROR, expectedValues: SUCCESSFUL_EXPECTED_VALUES, maxRetries });
+              const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, checks: ERROR_CHECKS, maxRetries });
 
               await retryRun;
 
@@ -188,7 +183,7 @@ describe('retry class', () => {
             describe('with custom timeout', () => {
               it('should wait proper time', async () => {
                 const maxRetries = 2;
-                const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, expectedKeys: SUCCESSFUL_EXPECTED_KEYS_ERROR, expectedValues: SUCCESSFUL_EXPECTED_VALUES, maxRetries, timeout: MODIFIED_TIMEOUT });
+                const retryRun = retry.retryTaskUntilExpectedValue({ task: successfulCommand, checks: ERROR_CHECKS, maxRetries, timeout: MODIFIED_TIMEOUT });
 
                 await retryRun;
 
