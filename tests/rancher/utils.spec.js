@@ -28,6 +28,11 @@ const RANCHER_INSTANCE_MOCK_DEPLOYMENT = {
   type: 'deployment'
 }
 
+const RANCHER_INSTANCE_MOCK_STATEFULSET = {
+  ...RANCHER_INSTANCE_MOCK,
+  type: 'statefulset'
+}
+
 const RANCHER_INSTANCE_MOCK_ASSERT_AGAINST_REPLICAS = {
   ...RANCHER_INSTANCE_MOCK_DEPLOYMENT,
   assertAgainstTemplateReplicas: true,
@@ -305,12 +310,26 @@ describe('RancherUtils class', () => {
       await expect(command(TARGET_SERVICE_NAME)).to.eventually.become(SERVICE_UPGRADE_PAYLOAD);
     });
 
-    describe('when type is not deployment', () => {
+    describe('when type is not deployment or statefulset', () => {
       it('should call rancherExecute with proper arguments', async () => {
         await command(TARGET_SERVICE_NAME);
 
         expect(rancherExecuteStub).to.have.been.calledWith(
           'inspect', [TARGET_SERVICE_NAME]
+        );
+      });
+    });
+
+    describe('when type is statefulset', () => {
+      beforeEach(() => {
+        command = RancherUtils.getServiceUpgradePayload.bind(RANCHER_INSTANCE_MOCK_STATEFULSET);
+      });
+
+      it('should call rancherExecute with proper arguments', async () => {
+        await command(TARGET_SERVICE_NAME);
+
+        expect(rancherExecuteStub).to.have.been.calledWith(
+          'inspect', [`statefulset:${TARGET_SERVICE_NAME}`]
         );
       });
     });
