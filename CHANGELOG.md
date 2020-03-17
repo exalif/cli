@@ -1,3 +1,12 @@
+## [3.3.1](https://github.com/exalif/cli/compare/3.3.0...3.3.1) (2020-03-17)
+
+
+### Features
+
+* upgrade rancher-cli to use latest kubectl ([#10](https://github.com/exalif/cli/issues/10)) ([2cb5d7e](https://github.com/exalif/cli/commit/2cb5d7e5825fdcb483bc66bd674ce5b83ed50841))
+
+
+
 # [3.3.0](https://github.com/exalif/cli/compare/3.2.1...3.3.0) (2020-03-12)
 
 
