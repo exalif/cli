@@ -1,4 +1,4 @@
-FROM blackholegalaxy/rancher-cli:2.3.2
+FROM blackholegalaxy/rancher-cli:2.3.2-3
 LABEL maintainer="exalif"
 
 ENV NODE_ENV production
