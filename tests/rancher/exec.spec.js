@@ -176,6 +176,7 @@ describe('RancherSingleServiceUtils class', () => {
       RANCHER_INSTANCE_MOCK.service,
       '-n',
       NAMESPACE,
+      '--',
       ...RANCHER_INSTANCE_MOCK.execCommand.split(' ')
     ];
 
