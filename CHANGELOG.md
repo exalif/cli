@@ -1,3 +1,12 @@
+## [3.3.2](https://github.com/exalif/cli/compare/3.3.1...3.3.2) (2020-03-20)
+
+
+### Bug Fixes
+
+* **exec:** escape kubectl executed command ([#12](https://github.com/exalif/cli/issues/12)) ([09e8ce6](https://github.com/exalif/cli/commit/09e8ce6c51d9b98bdc8aa55b0151cf5ac1a85678))
+
+
+
 ## [3.3.1](https://github.com/exalif/cli/compare/3.3.0...3.3.1) (2020-03-17)
 
 
